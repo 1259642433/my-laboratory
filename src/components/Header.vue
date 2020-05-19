@@ -30,7 +30,6 @@ export default {
         background-color: rgba(75, 75, 75, 1);
 
         .nav {
-            width: 1200px;
             height: 80px;
             margin: 0 auto;
             display: flex;
