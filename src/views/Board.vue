@@ -66,6 +66,9 @@ export default {
 
 <style lang="scss" scoped>
 .board{
-
+    height: 100%;
+  #boardCanvas{
+    height: 100%;
+  }
 }
 </style>

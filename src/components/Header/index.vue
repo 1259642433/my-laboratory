@@ -4,9 +4,6 @@
       <router-link to="/live" class="nav-item">
         Live
       </router-link>
-      <router-link to="/upload" class="nav-item">
-        上传
-      </router-link>
       <router-link to="/vrlive" class="nav-item">
         VRLive
       </router-link>
@@ -18,6 +15,9 @@
       </router-link>
       <router-link to="/webrtc" class="nav-item">
         WebRtc(1对多)
+      </router-link>
+      <router-link to="/sea" class="nav-item">
+        three(Shader)
       </router-link>
     </div>
   </div>

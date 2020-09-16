@@ -33,7 +33,7 @@ export default {
       .app-container {
         flex-grow: 1;
         div{
-          height: 100%;
+          // height: 100%;
         }
       }
   }
