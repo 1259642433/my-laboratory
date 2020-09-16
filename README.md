@@ -1,7 +1,7 @@
-# my-laboratory
+# vue-init
 
 #### 介绍
-学习实验室
+vue初始模板
 
 ## Project setup
 ```

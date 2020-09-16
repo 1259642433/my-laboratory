@@ -1,12 +1,15 @@
 <template>
-  <div id="app">
+  <div class="app">
     <Header v-if="$route.path!='/login'"></Header>
-    <router-view />
+    <div class="app-container">
+          <router-view />
+    </div>
+
   </div>
 </template>
 
 <script>
-import Header from '@/components/Header.vue'
+import Header from '@/components/Header'
 
 export default {
   name: 'App',
@@ -19,13 +22,20 @@ export default {
     }
   }
 }
+
 </script>
 <style lang="scss">
-@import "./assets/css/reset.scss";
-#app{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: rgba(85,85,85,1);
-}
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: rgba(85, 85, 85, 1);
+      .app-container {
+        flex-grow: 1;
+        div{
+          height: 100%;
+        }
+      }
+  }
+
 </style>

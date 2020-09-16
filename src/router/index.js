@@ -6,37 +6,47 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    redirect: '/test'
+    redirect: '/board'
   },
   {
     path: '/home',
     name: 'Home',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@v/Home')
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/Login.vue')
+    component: () => import('@v/Login')
   },
   {
     path: '/live',
     name: 'Live',
-    component: () => import('@/views/Live.vue')
-  },
-  {
-    path: '/upload',
-    name: 'Upload',
-    component: () => import('@/views/Upload.vue')
+    component: () => import('@v/Live')
   },
   {
     path: '/vrlive',
     name: 'VRLive',
-    component: () => import('@/views/VRLive.vue')
+    component: () => import('@v/VRLive')
+  },
+  {
+    path: '/imgscroll',
+    name: 'ImgScroll',
+    component: () => import('@v/ImgScroll')
+  },
+  {
+    path: '/board',
+    name: 'Board',
+    component: () => import('@v/Board')
+  },
+  {
+    path: '/webrtc',
+    name: 'WebRTC',
+    component: () => import('@v/WebRTC')
   },
   {
     path: '/test',
     name: 'Test',
-    component: () => import('@/views/Test.vue')
+    component: () => import('@v/Test')
   }
 ]
 

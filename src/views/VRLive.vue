@@ -101,7 +101,7 @@ export default {
       this.video.loop = true
       this.video.crossOrigin = 'Anonymous'
       // http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4
-      this.video.src = 'http://ivi.bupt.edu.cn/hls/cctv3hd.m3u8'
+      this.video.src = 'https://opmmj.oss-cn-beijing.aliyuncs.com/1.mp4'
       this.video.play()
     },
     initContent () {

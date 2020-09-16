@@ -92,7 +92,7 @@ export default {
 
 <style lang="scss" scoped>
     .live {
-        padding: 200px 0;
+        padding: 50px 0;
         p {
             text-align: center;
             margin-bottom: 30px;
