@@ -41,7 +41,17 @@ const routes = [
   {
     path: '/webrtc',
     name: 'WebRTC',
-    component: () => import('@v/WebRTC')
+    component: () => import('@v/WebRTC'),
+    children: [{
+      path: '',
+      component: () => import('@v/WebRTC/Choose')
+    }, {
+      path: 'live',
+      component: () => import('@v/WebRTC/Live')
+    }, {
+      path: 'recieve',
+      component: () => import('@v/WebRTC/Recieve')
+    }]
   },
   {
     path: '/sea',

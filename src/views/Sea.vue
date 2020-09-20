@@ -43,18 +43,18 @@ export default {
       clock = new THREE.Clock()
       animate()
 
-      // var mouseStartPosition = null // 鼠标起始位置
-      // window.addEventListener('mousemove', function (event) {
-      //   if (!mouseStartPosition) {
-      //     mouseStartPosition = {
-      //       x: event.clientX,
-      //       y: event.clientY
-      //     }
-      //   } else {
-      //     uniforms.iMouse.value.x = event.clientX - mouseStartPosition.x
-      //     uniforms.iMouse.value.y = event.clientY - mouseStartPosition.y
-      //   }
-      // })
+      var mouseStartPosition = null // 鼠标起始位置
+      window.addEventListener('mousemove', function (event) {
+        if (!mouseStartPosition) {
+          mouseStartPosition = {
+            x: event.clientX,
+            y: event.clientY
+          }
+        } else {
+          uniforms.iMouse.value.x = event.clientX - mouseStartPosition.x
+          uniforms.iMouse.value.y = event.clientY - mouseStartPosition.y
+        }
+      })
 
       window.addEventListener('resize', function () {
         onResize(el)
