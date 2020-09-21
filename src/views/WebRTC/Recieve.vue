@@ -1,6 +1,6 @@
 <template>
     <div class="recieve">
-        <video id="video" controls autoplay></video>
+        <video id="video" preload="auto" autoplay controls></video>
     </div>
 </template>
 
@@ -11,6 +11,7 @@ export default {
     return {
       stream: '',
       roomId: 1,
+      userId: '',
       iceServers: [{
         urls: [
           'stun:stun.l.google.com:19302',
@@ -22,71 +23,81 @@ export default {
       peer: ''
     }
   },
+  created () {
+    this.userId = Number(Math.random().toString().substr(3, length) + Date.now()).toString(36)
+  },
   mounted () {
     this.initSocket()
+    this.getPeerConnection()
   },
   methods: {
     initSocket () {
-      this.socket = io('ws://localhost:3001', {
+      this.socket = io('ws://144.34.165.131:3001', {
         reconnectionAttempts: 10
       })
-      this.sendToServer('join', {
-        roomId: this.roomId
+      this.socket.on('connect', () => {
+        this.sendToServer('join', {
+          roomId: this.roomId,
+          userId: this.userId
+        })
       })
       this.socket.on('joined', res => {
-        console.log(res)
+        console.log(`用户${res.userId}进入房间`)
       })
-
-      this.socket.on('getInfo', res => {
-        this.getPeerConnection(res, this.peer, this.iceServers)
+      this.socket.on('offer', res => {
+        var desc = new RTCSessionDescription(res)
+        this.peer.setRemoteDescription(desc)
+          .then(() => {
+            return this.peer.createAnswer()
+          })
+          .then(answer => {
+            return this.peer.setLocalDescription(answer)
+          })
+          .then(() => {
+            var msg = {
+              roomId: this.roomId,
+              userId: this.userId,
+              sdp: this.peer.localDescription
+            }
+            this.sendToServer('answer', msg)
+          })
+      })
+      this.socket.on('iceCandidate', res => {
+        this.peer.addIceCandidate(res)
       })
     },
-    getPeerConnection (info, peer, iceServers) {
+    getPeerConnection () {
       const PeerConnection = window.RTCPeerConnection ||
-                         window.mozRTCPeerConnection ||
-                         window.webkitRTCPeerConnection
-      peer = new PeerConnection(iceServers)
+                        window.mozRTCPeerConnection ||
+                        window.webkitRTCPeerConnection
+      this.peer = new PeerConnection(this.iceServers)
 
-      var desc = new RTCSessionDescription(info.sdp)
-      peer.setRemoteDescription(desc)
-        .then(function () {
-          return peer.createAnswer()
-        })
-        .then(answer => {
-          return peer.setLocalDescription(answer)
-        })
-        .then(() => {
-          var msg = {
-            roomId: this.roomId,
-            type: 'video-answer',
-            sdp: peer.localDescription
-          }
-          this.sendToServer('answer', msg)
-        })
-      peer.addIceCandidate(info.candidate)
-      peer.onaddstream = function (event) {
-        document.getElementById('video').srcObject = event.stream
+      this.peer.onaddstream = function (event) {
+        const video = document.getElementById('video')
+        video.muted = true
+        video.srcObject = event.stream
+        video.play()
       }
-      peer.onicecandidate = (event) => {
-        console.log(123)
+      this.peer.onicecandidate = (event) => {
+        // console.log(event)
       }
-      peer.onicecandidate = handleICECandidateEvent.bind(this)
+      // this.peer.onicecandidate = handleICECandidateEvent.bind(this)
 
-      peer.oniceconnectionstatechange = (evt) => {
+      this.peer.oniceconnectionstatechange = (evt) => {
         console.log('ICE connection state change: ' + evt.target.iceConnectionState)
-        if (event.candidate) {
-          this.$socket.emit('__ice_candidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
-        }
+        // if (event.candidate) {
+        //   this.$socket.emit('__ice_candidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
+        // }
       }
 
-      function handleICECandidateEvent (event) {
-        if (event.candidate) {
-          this.sendToServer({
-            type: 'new-ice-candidate',
-            candidate: event.candidate
-          })
-        }
-      }
+      // function handleICECandidateEvent (event) {
+      //   if (event.candidate) {
+      //     this.sendToServer({
+      //       type: 'new-ice-candidate',
+      //       candidate: event.candidate
+      //     })
+      //   }
+      // }
       // const join = function () {
       //   socket.emit('join', { roomid: this.roomid })
       // }

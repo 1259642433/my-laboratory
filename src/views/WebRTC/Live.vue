@@ -26,25 +26,25 @@ export default {
           'stun:stun.l.google.com:19302?transport=udp'
         ]
       }],
-      peer: ''
+      peerList: {}
     }
   },
   mounted () {
     this.initSocket()
-    this.initWebRTC()
+    this.getStream()
+
+    // this.initWebRTC()
   },
   methods: {
-    initWebRTC () {
+    getStream () {
       var constraints = {
         audio: true,
         video: true
       }
       window.navigator.mediaDevices.getDisplayMedia(constraints)
         .then((stream) => {
-          console.log(stream)
           this.stream = stream
           document.getElementById('video').srcObject = stream
-          this.peer = initPeer(this.iceServers)
           stream.onended = function () {
 
           }
@@ -60,92 +60,109 @@ export default {
               console.log('打开麦克风/摄像头出错: ' + e.message)
               break
           }
-          closeVideoCall(this.peer, document.getElementById('video'))
+          this.closeVideoCall(this.peer, document.getElementById('video'))
         })
+    },
+    createPeer (res) {
+      const PeerConnection = window.RTCPeerConnection ||
+                        window.mozRTCPeerConnection ||
+                        window.webkitRTCPeerConnection
+      const peer = new PeerConnection(this.iceServers)
+      // this.peer.onaddstream = function (event) {
 
-      const initPeer = function (iceServers) {
-        const PeerConnection = window.RTCPeerConnection ||
-                         window.mozRTCPeerConnection ||
-                         window.webkitRTCPeerConnection
-        const peer = new PeerConnection(iceServers)
-        // this.peer.onaddstream = function (event) {
-
-        // }
-        peer.onicecandidate = (event) => {
-          console.log(123)
-        }
-        peer.onicecandidate = handleICECandidateEvent.bind(this)
-        peer.onnegotiationneeded = handleNegotiationNeededEvent.bind(this)
-
-        peer.oniceconnectionstatechange = (evt) => {
-          console.log('ICE connection state change: ' + evt.target.iceConnectionState)
-          // if (event.candidate) {
-          //   this.$socket.emit('__ice_candidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
-          // }
-        }
-        peer.addStream(this.stream)
-
-        function handleICECandidateEvent (event) {
-          if (event.candidate) {
-            this.sendToServer('iceCandidate', {
-              roomId: this.roomId,
-              type: 'iceCandidate',
-              candidate: event.candidate
-            })
-          }
-        }
-
-        function handleNegotiationNeededEvent () {
-          peer.createOffer().then(function (offer) {
-            return peer.setLocalDescription(offer)
-          })
-            .then(function () {
-              this.sendToServer('offer', {
-                roomId: this.roomId,
-                type: 'video-offer',
-                sdp: peer.localDescription
-              })
-            }.bind(this))
-            .catch(e => { console.log(e) })
-        }
-        return peer
-      }.bind(this)
-      function closeVideoCall (peer, video) {
-        if (peer) {
-          peer.ontrack = null
-          peer.onremovetrack = null
-          peer.onremovestream = null
-          peer.onicecandidate = null
-          peer.oniceconnectionstatechange = null
-          peer.onsignalingstatechange = null
-          peer.onicegatheringstatechange = null
-          peer.onnegotiationneeded = null
-
-          if (video.srcObject) {
-            video.srcObject.getTracks().forEach(track => track.stop())
-          }
-
-          peer.close()
-          peer = null
-        }
-
-        video.removeAttribute('src')
-        video.removeAttribute('srcObject')
+      // }
+      peer.onicecandidate = (event) => {
+        // console.log(event)
       }
+      peer.onicecandidate = handleICECandidateEvent.bind(this)
+      peer.onnegotiationneeded = handleNegotiationNeededEvent.bind(this)
+
+      peer.oniceconnectionstatechange = (evt) => {
+        console.log('ICE connection state change: ' + evt.target.iceConnectionState)
+        // if (event.candidate) {
+        //   this.$socket.emit('iceCandidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
+        // }
+      }
+
+      peer.addStream(this.stream)
+
+      function handleICECandidateEvent (event) {
+        if (event.candidate) {
+          this.sendToServer('iceCandidate', {
+            userId: res.userId,
+            roomId: this.roomId,
+            candidate: event.candidate
+          })
+        }
+      }
+
+      function handleNegotiationNeededEvent () {
+        peer.createOffer().then(function (offer) {
+          return peer.setLocalDescription(offer)
+        })
+          .then(() => {
+            this.sendToServer('offer', {
+              userId: res.userId,
+              roomId: this.roomId,
+              sdp: peer.localDescription
+            })
+          })
+          .catch(e => { console.log(e) })
+      }
+      return peer
     },
     initSocket () {
-      this.socket = io('ws://localhost:3001', {
+      this.socket = io('ws://144.34.165.131:3001', {
         reconnectionAttempts: 10
       })
+      this.socket.on('connect', res => {
+        this.sendToServer('openRoom', {
+          roomId: this.roomId
+        })
+      })
+      this.socket.on('disconnect', res => {
+
+      })
+      this.socket.on('joined', res => {
+        console.log(`用户${res.userId}进入房间`)
+      })
+      this.socket.on('call', res => {
+        const peer = this.createPeer(res)
+        this.peerList[res.userId] = {
+          socketInfo: res,
+          peer: peer
+        }
+      })
       this.socket.on('answer', res => {
-        console.log('answerw', res)
         var desc = new RTCSessionDescription(res.sdp)
-        this.peer.setRemoteDescription(desc)
+        this.peerList[res.userId].peer.setRemoteDescription(desc)
       })
     },
     sendToServer (type, data) {
-      console.log(type, data)
+      // console.log(type, data)
       this.socket.emit(type, data)
+    },
+    closeVideoCall (peer, video) {
+      if (peer) {
+        peer.ontrack = null
+        peer.onremovetrack = null
+        peer.onremovestream = null
+        peer.onicecandidate = null
+        peer.oniceconnectionstatechange = null
+        peer.onsignalingstatechange = null
+        peer.onicegatheringstatechange = null
+        peer.onnegotiationneeded = null
+
+        if (video.srcObject) {
+          video.srcObject.getTracks().forEach(track => track.stop())
+        }
+
+        peer.close()
+        peer = null
+      }
+
+      video.removeAttribute('src')
+      video.removeAttribute('srcObject')
     }
   }
 }
