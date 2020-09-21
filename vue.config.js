@@ -128,7 +128,7 @@ module.exports = {
           {
             analyzerMode: 'server',
             analyzerHost: 'localhost',
-            analyzerPort: 10000,
+            analyzerPort: 12555,
             reportFilename: 'report.html',
             defaultSizes: 'parsed',
             openAnalyzer: false,

@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     initSocket () {
-      this.socket = io('ws://144.34.165.131:3001', {
+      this.socket = io('wss://144.34.165.131:3001', {
         reconnectionAttempts: 10
       })
       this.socket.on('connect', () => {

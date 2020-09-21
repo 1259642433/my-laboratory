@@ -112,16 +112,17 @@ export default {
       return peer
     },
     initSocket () {
-      this.socket = io('ws://144.34.165.131:3001', {
+      this.socket = io('wss://www.wangwentehappy.tk:3001', {
         reconnectionAttempts: 10
       })
       this.socket.on('connect', res => {
+        console.log('连接成功')
         this.sendToServer('openRoom', {
           roomId: this.roomId
         })
       })
       this.socket.on('disconnect', res => {
-
+        console.log('断开连接')
       })
       this.socket.on('joined', res => {
         console.log(`用户${res.userId}进入房间`)
