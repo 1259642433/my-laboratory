@@ -1,7 +1,7 @@
 <template>
   <div class="live">
-    <video id="video" controls autoplay></video>
-    <!-- <Board></Board> -->
+    <!-- <video id="video" controls autoplay></video> -->
+    <Board></Board>
   </div>
 </template>
 
@@ -44,7 +44,7 @@ export default {
       window.navigator.mediaDevices.getDisplayMedia(constraints)
         .then((stream) => {
           this.stream = stream
-          document.getElementById('video').srcObject = stream
+          // document.getElementById('video').srcObject = stream
           stream.onended = function () {
 
           }
@@ -176,6 +176,7 @@ export default {
 
     #video {
       width: 100%;
+      background-color: white;
     }
   }
 
