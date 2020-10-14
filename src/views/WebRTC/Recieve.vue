@@ -12,14 +12,11 @@ export default {
       stream: '',
       roomId: 1,
       userId: '',
-      iceServers: [{
-        urls: [
-          'stun:stun.l.google.com:19302',
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun.l.google.com:19302?transport=udp'
-        ]
-      }],
+      config: {
+        iceServers: [{
+          urls: 'stun:144.34.165.131:3478'
+        }]
+      },
       peer: ''
     }
   },
@@ -63,14 +60,16 @@ export default {
           })
       })
       this.socket.on('iceCandidate', res => {
-        this.peer.addIceCandidate(res)
+        var candidate = new RTCIceCandidate(res.candidate)
+        console.log(candidate)
+        this.peer.addIceCandidate(candidate)
       })
     },
     getPeerConnection () {
       const PeerConnection = window.RTCPeerConnection ||
                         window.mozRTCPeerConnection ||
                         window.webkitRTCPeerConnection
-      this.peer = new PeerConnection(this.iceServers)
+      this.peer = new PeerConnection(this.config)
 
       this.peer.onaddstream = function (event) {
         const video = document.getElementById('video')
@@ -78,10 +77,8 @@ export default {
         video.srcObject = event.stream
         video.play()
       }
-      this.peer.onicecandidate = (event) => {
-        // console.log(event)
-      }
-      // this.peer.onicecandidate = handleICECandidateEvent.bind(this)
+
+      this.peer.onicecandidate = handleICECandidateEvent.bind(this)
 
       this.peer.oniceconnectionstatechange = (evt) => {
         console.log('ICE connection state change: ' + evt.target.iceConnectionState)
@@ -90,17 +87,16 @@ export default {
         // }
       }
 
-      // function handleICECandidateEvent (event) {
-      //   if (event.candidate) {
-      //     this.sendToServer({
-      //       type: 'new-ice-candidate',
-      //       candidate: event.candidate
-      //     })
-      //   }
-      // }
-      // const join = function () {
-      //   socket.emit('join', { roomid: this.roomid })
-      // }
+      function handleICECandidateEvent (event) {
+        if (event.candidate) {
+          this.sendToServer('iceCandidateFromUser', {
+            userId: this.userId,
+            roomId: this.roomId,
+            candidate: event.candidate
+          })
+        }
+      }
+
       function closeVideoCall (peer, video) {
         // 关闭peer及释放其他尝试调用过程中已分配的任何资源
 

@@ -18,14 +18,11 @@ export default {
       roomId: 1,
       user: 1,
       stream: '',
-      iceServers: [{
-        urls: [
-          'stun:stun.l.google.com:19302',
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun.l.google.com:19302?transport=udp'
-        ]
-      }],
+      config: {
+        iceServers: [{
+          urls: 'stun:144.34.165.131:3478'
+        }]
+      },
       peerList: {}
     }
   },
@@ -67,13 +64,12 @@ export default {
       const PeerConnection = window.RTCPeerConnection ||
                         window.mozRTCPeerConnection ||
                         window.webkitRTCPeerConnection
-      const peer = new PeerConnection(this.iceServers)
+      const peer = new PeerConnection(this.config)
+
       // this.peer.onaddstream = function (event) {
 
       // }
-      peer.onicecandidate = (event) => {
-        // console.log(event)
-      }
+
       peer.onicecandidate = handleICECandidateEvent.bind(this)
       peer.onnegotiationneeded = handleNegotiationNeededEvent.bind(this)
 
@@ -137,6 +133,11 @@ export default {
       this.socket.on('answer', res => {
         var desc = new RTCSessionDescription(res.sdp)
         this.peerList[res.userId].peer.setRemoteDescription(desc)
+      })
+      this.socket.on('iceCandidateFromUser', res => {
+        var candidate = new RTCIceCandidate(res.candidate)
+        console.log(candidate)
+        this.peerList[res.userId].peer.addIceCandidate(candidate)
       })
     },
     sendToServer (type, data) {
