@@ -121,7 +121,7 @@ export default {
         console.log('断开连接')
       })
       this.socket.on('joined', res => {
-        console.log(`用户${res.userId}进入房间`)
+        console.log(`用户${res.userId}进入房间，当前房间在线人数${res.roomUserNum}`)
       })
       this.socket.on('call', res => {
         const peer = this.createPeer(res)

@@ -39,7 +39,7 @@ export default {
         })
       })
       this.socket.on('joined', res => {
-        console.log(`用户${res.userId}进入房间`)
+        console.log(`用户${res.userId}进入房间，当前房间在线人数${res.roomUserNum}`)
       })
       this.socket.on('offer', res => {
         var desc = new RTCSessionDescription(res)
