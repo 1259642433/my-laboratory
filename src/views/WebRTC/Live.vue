@@ -20,6 +20,8 @@ export default {
       stream: '',
       iceServers: [{
         urls: [
+          'stun:stun,xten.com:3478',
+          'stun:www.wangwentehappy.tk',
           'stun:stun.l.google.com:19302',
           'stun:stun1.l.google.com:19302',
           'stun:stun2.l.google.com:19302',
@@ -68,19 +70,23 @@ export default {
                         window.mozRTCPeerConnection ||
                         window.webkitRTCPeerConnection
       const peer = new PeerConnection(this.iceServers)
+
       // this.peer.onaddstream = function (event) {
 
       // }
+
       peer.onicecandidate = (event) => {
-        // console.log(event)
+        console.log('onicecandidate', event)
       }
+
       peer.onicecandidate = handleICECandidateEvent.bind(this)
       peer.onnegotiationneeded = handleNegotiationNeededEvent.bind(this)
 
-      peer.oniceconnectionstatechange = (evt) => {
-        console.log('ICE connection state change: ' + evt.target.iceConnectionState)
+      peer.oniceconnectionstatechange = (event) => {
+        console.log('ICE connection state change: ', event)
+        this.text += `<p>ICE connection state change: ${event.target.iceConnectionState}</p>`
         // if (event.candidate) {
-        //   this.$socket.emit('iceCandidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
+        //   this.$socket.emit('__ice_candidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
         // }
       }
 

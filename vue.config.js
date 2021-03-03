@@ -80,8 +80,8 @@ module.exports = {
       config.mode = 'production'
       // 打包优化，去除console.log
       // vuecli4默认引入依赖terser插件，在这个基础上直接添加属性即可
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
-      config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = ['console.log']
+      // config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
+      // config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = ['console.log']
       // TODO 等待后续测试是否生效
       // 配置splitChunks(webpack4内置), 将公用组件，样式等等提取出来,减少打包体积
       config.optimization.splitChunks = {

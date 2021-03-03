@@ -1,6 +1,7 @@
 <template>
     <div class="recieve">
         <video id="video" preload="auto" autoplay controls></video>
+        <p v-html="text"></p>
     </div>
 </template>
 
@@ -14,13 +15,16 @@ export default {
       userId: '',
       iceServers: [{
         urls: [
+          'stun:www.wangwentehappy.tk',
+          'stun:stun.voipstunt.com',
           'stun:stun.l.google.com:19302',
           'stun:stun1.l.google.com:19302',
           'stun:stun2.l.google.com:19302',
           'stun:stun.l.google.com:19302?transport=udp'
         ]
       }],
-      peer: ''
+      peer: '',
+      text: ''
     }
   },
   created () {
@@ -45,6 +49,7 @@ export default {
         console.log(`用户${res.userId}进入房间`)
       })
       this.socket.on('offer', res => {
+        console.log('offer', res)
         var desc = new RTCSessionDescription(res)
         this.peer.setRemoteDescription(desc)
           .then(() => {
@@ -63,7 +68,8 @@ export default {
           })
       })
       this.socket.on('iceCandidate', res => {
-        this.peer.addIceCandidate(res)
+        console.log('iceCandidate', res)
+        this.peer.addIceCandidate(res.candidate)
       })
     },
     getPeerConnection () {
@@ -73,18 +79,20 @@ export default {
       this.peer = new PeerConnection(this.iceServers)
 
       this.peer.onaddstream = function (event) {
+        console.log(event)
         const video = document.getElementById('video')
         video.muted = true
         video.srcObject = event.stream
         video.play()
       }
       this.peer.onicecandidate = (event) => {
-        // console.log(event)
+        // console.log('onicecandidate', event)
       }
       // this.peer.onicecandidate = handleICECandidateEvent.bind(this)
 
-      this.peer.oniceconnectionstatechange = (evt) => {
-        console.log('ICE connection state change: ' + evt.target.iceConnectionState)
+      this.peer.oniceconnectionstatechange = (event) => {
+        console.log('ICE connection state change: ' + event)
+        this.text += `<p>ICE connection state change: ${event.target.iceConnectionState}</p>`
         // if (event.candidate) {
         //   this.$socket.emit('__ice_candidate', { candidate: event.candidate, roomid: this.$route.params.roomid, account: v.account })
         // }
