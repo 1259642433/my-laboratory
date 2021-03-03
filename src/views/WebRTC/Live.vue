@@ -18,16 +18,11 @@ export default {
       roomId: 1,
       user: 1,
       stream: '',
-      iceServers: [{
-        urls: [
-          'stun:stun,xten.com:3478',
-          'stun:www.wangwentehappy.tk',
-          'stun:stun.l.google.com:19302',
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun.l.google.com:19302?transport=udp'
-        ]
-      }],
+      config: {
+        iceServers: [{
+          urls: 'stun:144.34.165.131:3478'
+        }]
+      },
       peerList: {}
     }
   },
@@ -69,15 +64,11 @@ export default {
       const PeerConnection = window.RTCPeerConnection ||
                         window.mozRTCPeerConnection ||
                         window.webkitRTCPeerConnection
-      const peer = new PeerConnection(this.iceServers)
+      const peer = new PeerConnection(this.config)
 
       // this.peer.onaddstream = function (event) {
 
       // }
-
-      peer.onicecandidate = (event) => {
-        console.log('onicecandidate', event)
-      }
 
       peer.onicecandidate = handleICECandidateEvent.bind(this)
       peer.onnegotiationneeded = handleNegotiationNeededEvent.bind(this)
@@ -131,7 +122,7 @@ export default {
         console.log('断开连接')
       })
       this.socket.on('joined', res => {
-        console.log(`用户${res.userId}进入房间`)
+        console.log(`用户${res.userId}进入房间，当前房间在线人数${res.roomUserNum}`)
       })
       this.socket.on('call', res => {
         const peer = this.createPeer(res)
@@ -143,6 +134,11 @@ export default {
       this.socket.on('answer', res => {
         var desc = new RTCSessionDescription(res.sdp)
         this.peerList[res.userId].peer.setRemoteDescription(desc)
+      })
+      this.socket.on('iceCandidateFromUser', res => {
+        var candidate = new RTCIceCandidate(res.candidate)
+        console.log(candidate)
+        this.peerList[res.userId].peer.addIceCandidate(candidate)
       })
     },
     sendToServer (type, data) {

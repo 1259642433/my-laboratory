@@ -28,6 +28,7 @@ import {
 
 window.videojs = videojs
 // hls plugin for videojs6
+require('videojs-flash')
 require('videojs-contrib-hls/dist/videojs-contrib-hls.js')
 export default {
   name: 'live',
@@ -44,10 +45,12 @@ export default {
       barrageList: [],
       playerOptions: {
         height: '432',
+        techOrder: ['html5', 'flash'],
         sources: [{
           withCredentials: false,
           type: 'application/x-mpegURL',
-          src: 'http://ivi.bupt.edu.cn/hls/cctv3hd.m3u8'
+          // cctv3 http://ivi.bupt.edu.cn/hls/cctv3hd.m3u8
+          src: 'http://144.34.165.131:8000/live/wwt/index.m3u8'
         }],
         controlBar: {
           timeDivider: false,
