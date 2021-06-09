@@ -109,7 +109,7 @@ export default {
       return peer
     },
     initSocket () {
-      this.socket = io('wss://www.wangwentehappy.tk:3001', {
+      this.socket = io('wss://www.ashenone.tk:3001', {
         reconnectionAttempts: 10
       })
       this.socket.on('connect', res => {

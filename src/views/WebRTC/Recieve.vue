@@ -1,7 +1,7 @@
 <template>
     <div class="recieve">
         <video id="video" preload="auto" autoplay controls></video>
-        <p v-html="text"></p>
+        <!-- <p v-html="text"></p> -->
     </div>
 </template>
 
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     initSocket () {
-      this.socket = io('wss://www.wangwentehappy.tk:3001', {
+      this.socket = io('wss://www.ashenone.tk:3001', {
         reconnectionAttempts: 10
       })
       this.socket.on('connect', () => {
