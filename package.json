@@ -15,7 +15,7 @@
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "socket.io-client": "^2.3.0",
-    "three": "^0.120.1",
+    "three": "^0.137.0",
     "vue": "^2.6.11",
     "vue-baberrage": "^3.2.4",
     "vue-particles": "^1.0.9",
